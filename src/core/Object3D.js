@@ -74,6 +74,14 @@ THREE.Object3D.prototype = {
 
 	},
 
+    translateXYZ : function( distanceX, distanceY, distanceZ ) {
+    
+		this.translate( distanceX, this._vector.set( 1, 0, 0 ) );
+		this.translate( distanceY, this._vector.set( 0, 1, 0 ) );
+		this.translate( distanceZ, this._vector.set( 0, 0, 1 ) );
+    
+    },
+
 	lookAt : function ( vector ) {
 
 		// TODO: Add hierarchy support.
