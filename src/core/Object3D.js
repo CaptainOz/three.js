@@ -80,6 +80,37 @@ THREE.Object3D.prototype = {
     
     },
 
+    rotate : function( radians, axis ) {
+
+        this.matrix.rotateAxis( axis );
+        this.rotation.addSelf( axis.multiplyScalar( radians ) );
+
+    },
+
+    rotateX : function( radians ) {
+
+        this.rotate( radians, this._vector.set( 1, 0, 0 ) );
+
+    },
+
+    rotateY : function( radians ) {
+
+        this.rotate( radians, this._vector.set( 0, 1, 0 ) );
+
+    },
+
+    rotateZ : function( radians ) {
+
+        this.rotate( radians, this._vector.set( 0, 0, 1 ) );
+
+    },
+
+    rotateXYZ : function( radiansX, radiansY, radiansZ ) {
+
+        this.rotation.addSelf( this._vector.set( radiansX, radiansY, radiansZ ) );
+
+    },
+
 	lookAt : function ( vector ) {
 
 		// TODO: Add hierarchy support.
