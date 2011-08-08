@@ -49,40 +49,43 @@ THREE.Object3D = function() {
 
 THREE.Object3D.prototype = {
 
-	translate : function ( distance, axis ) {
+	translate : function ( distance, axis, useWorldSpace ) {
 
-		this.matrix.rotateAxis( axis );
+        if( !useWorldSpace )
+    		this.matrix.rotateAxis( axis );
 		this.position.addSelf( axis.multiplyScalar( distance ) );
 
 	},
 
-	translateX : function ( distance ) {
+	translateX : function ( distance, useWorldSpace ) {
 
-		this.translate( distance, this._vector.set( 1, 0, 0 ) );
-
-	},
-
-	translateY : function ( distance ) {
-
-		this.translate( distance, this._vector.set( 0, 1, 0 ) );
+		this.translate( distance, this._vector.set( 1, 0, 0 ), useWorldSpace );
 
 	},
 
-	translateZ : function ( distance ) {
+	translateY : function ( distance, useWorldSpace ) {
 
-		this.translate( distance, this._vector.set( 0, 0, 1 ) );
+		this.translate( distance, this._vector.set( 0, 1, 0 ), useWorldSpace );
 
 	},
 
-    translateXYZ : function( distanceX, distanceY, distanceZ ) {
-    
-        this.position.addSelf( this._vector.set( distanceX, distanceY, distanceZ ) );
+	translateZ : function ( distance, useWorldSpace ) {
+
+		this.translate( distance, this._vector.set( 0, 0, 1 ), useWorldSpace );
+
+	},
+
+    translateXYZ : function( distanceX, distanceY, distanceZ, useWorldSpace ) {
+
+        this._vector.set( distanceX, distanceY, distanceZ );
+        if( !useWorldSpace )
+            this.matrix.rotateAxis( this._vector );
+        this.position.addSelf( this._vector );
     
     },
 
     rotate : function( radians, axis ) {
 
-        this.matrix.rotateAxis( axis );
         this.rotation.addSelf( axis.multiplyScalar( radians ) );
 
     },
