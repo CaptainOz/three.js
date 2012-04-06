@@ -163,20 +163,16 @@ THREE.Rectangle = function () {
 
 	};
 
-	/*
-	this.contains = function ( x, y ) {
+	this.intersects = function ( r ) {
 
-		return x > _left && x < _right && y > _top && y < _bottom;
+		// http://gamemath.com/2011/09/detecting-whether-two-boxes-overlap/
 
-	};
-	*/
+		if ( _right < r.getLeft() ) return false;
+		if ( _left > r.getRight() ) return false;
+		if ( _bottom < r.getTop() ) return false;
+		if ( _top > r.getBottom() ) return false;
 
-	this.instersects = function ( r ) {
-
-		// return this.contains( r.getLeft(), r.getTop() ) || this.contains( r.getRight(), r.getTop() ) || this.contains( r.getLeft(), r.getBottom() ) || this.contains( r.getRight(), r.getBottom() );
-
-		return Math.min( _right, r.getRight() ) - Math.max( _left, r.getLeft() ) >= 0 &&
-		        Math.min( _bottom, r.getBottom() ) - Math.max( _top, r.getTop() ) >= 0;
+		return true;
 
 	};
 

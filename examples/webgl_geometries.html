@@ -1,29 +1,26 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometries</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
 			}
-			#log { color:#fff; position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
 		</style>
 	</head>
 	<body>
 
-		<pre id="log"></pre>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
-
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -31,57 +28,62 @@
 
 			var camera, scene, renderer;
 
-			var objects = [];
-
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
-
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.y = 200;
-				camera.position.z = 800;
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				scene = new THREE.Scene();
 
-				var light, object, material;
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.y = 400;
+				scene.add( camera );
 
-				scene.addLight( new THREE.AmbientLight( 0x404040 ) );
+				var light, object, materials;
 
-				light = new THREE.DirectionalLight( 0xffffff, 2.0 );
-				light.position.z = 1;
-				scene.addLight( light );
+				scene.add( new THREE.AmbientLight( 0x404040 ) );
 
-				material = [
-					new THREE.MeshLambertMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/UV.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, opacity: 0.1 } )
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0, 1 );
+				scene.add( light );
+
+				materials = [
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ) } ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
 				];
 
-				objects[ 0 ] = object = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), material );
-				object.position.x = - 200;
-				object.position.z = 200;
-				scene.addObject( object );
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), materials );
+				object.position.set( -200, 0, 400 );
+				scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), materials );
+				object.position.set( 0, 0, 400 );
+				scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.IcosahedronGeometry( 75, 1 ), materials );
+				object.position.set( -200, 0, 200 );
+				scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.OctahedronGeometry( 75, 2 ), materials );
+				object.position.set( 0, 0, 200 );
+				scene.add( object );
 
 
-				objects[ 1 ] = object = new THREE.Mesh( new THREE.CylinderGeometry( 50, 25, 75, 100 ), material );
-				object.position.z = 200;
-				scene.addObject( object );
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.TetrahedronGeometry( 75, 0 ), materials );
+				object.position.set( 200, 0, 200 );
+				scene.add( object );
 
-				objects[ 2 ] = object = new THREE.Mesh( new THREE.IcosahedronGeometry( 2 ), material );
-				object.position.x = 200;
-				object.position.z = 200;
-				object.scale.x = object.scale.y = object.scale.z = 75;
-				scene.addObject( object );
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry( 100, 100, 4, 4 ), materials );
+				object.children[ 0 ].doubleSided = true;
+				object.position.set( -200, 0, 0 );
+				scene.add( object );
 
-				objects[ 3 ] = object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
-				object.position.x = - 200;
-				scene.addObject( object );
-
-				objects[ 4 ] = object = new THREE.Mesh( new THREE.SphereGeometry( 75, 20, 10 ), material );
-				scene.addObject( object );
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.SphereGeometry( 75, 20, 10 ), materials );
+				object.position.set( 0, 0, 0 );
+				scene.add( object );
 
 				var points = [];
 
@@ -91,26 +93,25 @@
 
 				}
 
-				objects[ 5 ] = object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
-				object.position.x = 200;
-				scene.addObject( object );
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.LatheGeometry( points, 20 ), materials );
+				object.children[ 0 ].doubleSided = true;
+				object.position.set( 200, 0, 0 );
+				scene.add( object );
 
-				objects[ 6 ] = object = new THREE.Mesh( new THREE.TorusGeometry( 50, 20, 20, 20 ), material );
-				object.position.x = - 200;
-				object.position.z = - 200;
-				scene.addObject( object );
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.TorusGeometry( 50, 20, 20, 20 ), materials );
+				object.position.set( -200, 0, -200 );
+				scene.add( object );
 
-				objects[ 7 ] = object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), material );
-				object.position.z = - 200;
-				scene.addObject( object );
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), materials );
+				object.position.set( 0, 0, -200 );
+				scene.add( object );
 
-				objects[ 8 ] = object = new THREE.Trident();
-				object.position.x = 200;
-				object.position.z = - 200;
+				object = new THREE.AxisHelper();
+				object.position.set( 200, 0, -200 );
 				object.scale.x = object.scale.y = object.scale.z = 0.5;
-				scene.addObject( object );
+				scene.add( object );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
@@ -135,14 +136,16 @@
 
 			function render() {
 
-				var timer = new Date().getTime() * 0.0001;
+				var timer = Date.now() * 0.0001;
 
 				camera.position.x = Math.cos( timer ) * 800;
 				camera.position.z = Math.sin( timer ) * 800;
 
-				for ( var i = 0, l = objects.length; i < l; i++ ) {
+				camera.lookAt( scene.position );
 
-					var object = objects[ i ];
+				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+					var object = scene.children[ i ];
 
 					object.rotation.x += 0.01;
 					object.rotation.y += 0.005;

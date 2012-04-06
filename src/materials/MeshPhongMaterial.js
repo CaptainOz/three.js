@@ -26,7 +26,9 @@
  *  wireframeLinewidth: <float>,
  *
  *  vertexColors: false / THREE.VertexColors / THREE.FaceColors,
- *  skinning: <bool>
+ *  skinning: <bool>,
+ *
+ *	fog: <bool>
  * }
  */
 
@@ -37,9 +39,15 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	parameters = parameters || {};
 
 	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
-	this.ambient = parameters.ambient !== undefined ? new THREE.Color( parameters.ambient ) : new THREE.Color( 0x050505 );
+	this.ambient = parameters.ambient !== undefined ? new THREE.Color( parameters.ambient ) : new THREE.Color( 0xffffff );
 	this.specular = parameters.specular !== undefined ? new THREE.Color( parameters.specular ) : new THREE.Color( 0x111111 );
 	this.shininess = parameters.shininess !== undefined ? parameters.shininess : 30;
+
+	this.metal = parameters.metal !== undefined ? parameters.metal : false;
+	this.perPixel = parameters.perPixel !== undefined ? parameters.perPixel : false;
+
+	this.wrapAround = parameters.wrapAround !== undefined ? parameters.wrapAround: false;
+	this.wrapRGB = new THREE.Vector3( 1, 1, 1 );
 
 	this.map = parameters.map !== undefined ? parameters.map : null;
 
@@ -50,7 +58,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.reflectivity = parameters.reflectivity !== undefined ? parameters.reflectivity : 1;
 	this.refractionRatio = parameters.refractionRatio !== undefined ? parameters.refractionRatio : 0.98;
 
-	// this.enableFog = parameters.enableFog ? parameters.enableFog : true;
+	this.fog = parameters.fog !== undefined ? parameters.fog : true;
 
 	this.shading = parameters.shading !== undefined ? parameters.shading : THREE.SmoothShading;
 
@@ -63,6 +71,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false;
 	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false;
+	this.morphNormals = parameters.morphNormals !== undefined ? parameters.morphNormals : false;
 
 };
 

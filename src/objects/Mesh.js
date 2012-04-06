@@ -4,21 +4,18 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.Mesh = function ( geometry, materials ) {
+THREE.Mesh = function ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry;
-	this.materials = materials && materials.length ? materials : [ materials ];
-
-	this.overdraw = false; // TODO: Move to material?
-
+	this.material = ( material !== undefined ) ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } );
 
 	if ( this.geometry ) {
 
 		// calc bound radius
 
-		if( !this.geometry.boundingSphere ) {
+		if( ! this.geometry.boundingSphere ) {
 
 			this.geometry.computeBoundingSphere();
 
@@ -36,7 +33,7 @@ THREE.Mesh = function ( geometry, materials ) {
 			this.morphTargetInfluences = [];
 			this.morphTargetDictionary = {};
 
-			for( var m = 0; m < this.geometry.morphTargets.length; m++ ) {
+			for( var m = 0; m < this.geometry.morphTargets.length; m ++ ) {
 
 				this.morphTargetInfluences.push( 0 );
 				this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
@@ -65,6 +62,7 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function( name ) {
 		return this.morphTargetDictionary[ name ];
 	}
 
-	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );	
+	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );
 	return 0;
+
 }

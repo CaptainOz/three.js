@@ -1,3 +1,7 @@
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
 THREE.Matrix3 = function () {
 
 	this.m = [];
@@ -6,7 +10,10 @@ THREE.Matrix3 = function () {
 
 THREE.Matrix3.prototype = {
 
-	transpose : function () {
+	constructor: THREE.Matrix3,
+
+	/*
+	transpose: function () {
 
 		var tmp, m = this.m;
 
@@ -17,8 +24,9 @@ THREE.Matrix3.prototype = {
 		return this;
 
 	},
+	*/
 
-	transposeIntoArray : function ( r ) {
+	transposeIntoArray: function ( r ) {
 
 		var m = this.m;
 

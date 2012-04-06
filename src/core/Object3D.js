@@ -4,7 +4,11 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Object3D = function() {
+THREE.Object3D = function () {
+
+	this.id = THREE.Object3DCount ++;
+
+	this.name = '';
 
 	this.parent = undefined;
 	this.children = [];
@@ -16,8 +20,6 @@ THREE.Object3D = function() {
 	this.eulerOrder = 'XYZ';
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
-	this.dynamic = false; // when true it retains arrays so they can be updated with __dirty*
-	
 	this.doubleSided = false;
 	this.flipSided = false;
 
@@ -40,14 +42,29 @@ THREE.Object3D = function() {
 
 	this.visible = true;
 
-	this._vector = new THREE.Vector3();
+	this.castShadow = false;
+	this.receiveShadow = false;
 
-	this.name = "";
+	this.frustumCulled = true;
+
+	this._vector = new THREE.Vector3();
 
 };
 
 
 THREE.Object3D.prototype = {
+
+	constructor: THREE.Object3D,
+
+	applyMatrix: function ( matrix ) {
+
+		this.matrix.multiply( matrix, this.matrix );
+
+		this.scale.getScaleFromMatrix( this.matrix );
+		this.rotation.getRotationFromMatrix( this.matrix, this.scale );
+		this.position.getPositionFromMatrix( this.matrix );
+
+	},
 
 	translate : function ( distance, axis, useWorldSpace ) {
 
@@ -122,24 +139,31 @@ THREE.Object3D.prototype = {
 
 		if ( this.rotationAutoUpdate ) {
 
-			this.rotation.setRotationFromMatrix( this.matrix );
+			this.rotation.getRotationFromMatrix( this.matrix );
 
 		}
 
 	},
 
-	addChild: function ( child ) {
+	add: function ( object ) {
 
-		if ( this.children.indexOf( child ) === - 1 ) {
+		if ( object === this ) {
 
-			if( child.parent !== undefined ) {
+			console.warn( 'THREE.Object3D.add: An object can\'t be added as a child of itself.' );
+			return;
 
-				child.parent.removeChild( child );
+		}
+
+		if ( this.children.indexOf( object ) === - 1 ) {
+
+			if ( object.parent !== undefined ) {
+
+				object.parent.remove( object );
 
 			}
 
-			child.parent = this;
-			this.children.push( child );
+			object.parent = this;
+			this.children.push( object );
 
 			// add to scene
 
@@ -153,7 +177,7 @@ THREE.Object3D.prototype = {
 
 			if ( scene !== undefined && scene instanceof THREE.Scene )  {
 
-				scene.addChildRecurse( child );
+				scene.__addObject( object );
 
 			}
 
@@ -161,14 +185,30 @@ THREE.Object3D.prototype = {
 
 	},
 
-	removeChild: function ( child ) {
+	remove: function ( object ) {
 
-		var childIndex = this.children.indexOf( child );
+		var index = this.children.indexOf( object );
 
-		if ( childIndex !== - 1 ) {
+		if ( index !== - 1 ) {
 
-			child.parent = undefined;
-			this.children.splice( childIndex, 1 );
+			object.parent = undefined;
+			this.children.splice( index, 1 );
+
+			// remove from scene
+
+			var scene = this;
+
+			while ( scene.parent !== undefined ) {
+
+				scene = scene.parent;
+
+			}
+
+			if ( scene !== undefined && scene instanceof THREE.Scene ) {
+
+				scene.__removeObject( object );
+
+			}
 
 		}
 
@@ -178,7 +218,7 @@ THREE.Object3D.prototype = {
 
 		var c, cl, child, recurseResult;
 
-		for ( c = 0, cl = this.children.length; c < cl; c++ ) {
+		for ( c = 0, cl = this.children.length; c < cl; c ++ ) {
 
 			child = this.children[ c ];
 
@@ -231,17 +271,17 @@ THREE.Object3D.prototype = {
 
 	},
 
-	update: function ( parentMatrixWorld, forceUpdate, camera ) {
+	updateMatrixWorld: function ( force ) {
 
 		this.matrixAutoUpdate && this.updateMatrix();
 
 		// update matrixWorld
 
-		if ( this.matrixWorldNeedsUpdate || forceUpdate ) {
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
-			if ( parentMatrixWorld ) {
+			if ( this.parent ) {
 
-				this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
+				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
 
 			} else {
 
@@ -249,11 +289,9 @@ THREE.Object3D.prototype = {
 
 			}
 
-			this.matrixRotationWorld.extractRotation( this.matrixWorld, this.scale );
-
 			this.matrixWorldNeedsUpdate = false;
 
-			forceUpdate = true;
+			force = true;
 
 		}
 
@@ -261,10 +299,12 @@ THREE.Object3D.prototype = {
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-			this.children[ i ].update( this.matrixWorld, forceUpdate, camera );
+			this.children[ i ].updateMatrixWorld( force );
 
 		}
 
 	}
 
 };
+
+THREE.Object3DCount = 0;
